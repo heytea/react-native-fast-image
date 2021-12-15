@@ -11,6 +11,7 @@ import {
     StyleProp,
     TransformsStyle,
     AccessibilityProps,
+    Platform,
 } from 'react-native'
 
 const FastImageViewNativeModule = NativeModules.FastImageView
@@ -203,6 +204,10 @@ interface FastImageStaticProperties {
     priority: typeof priority
     cacheControl: typeof cacheControl
     preload: (sources: Source[]) => void
+    /**
+     * Only support android yet
+     */
+    preloadAsync?: (sources: Source[]) => Promise<boolean[] | undefined>
 }
 
 const FastImage: React.ComponentType<FastImageProps> &
@@ -216,6 +221,13 @@ FastImage.priority = priority
 
 FastImage.preload = (sources: Source[]) =>
     FastImageViewNativeModule.preload(sources)
+
+FastImage.preloadAsync = async (sources: Source[]) => {
+    if (Platform.OS === 'android') {
+        return await FastImageViewNativeModule.preloadAsync(sources)
+    }
+    return undefined
+}
 
 const styles = StyleSheet.create({
     imageContainer: {
