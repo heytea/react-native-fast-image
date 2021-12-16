@@ -18,6 +18,8 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.WritableNativeArray;
 
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -100,7 +102,7 @@ class FastImageViewModule extends ReactContextBaseJavaModule implements Lifecycl
                     final ReadableMap source = sources.getMap(i);
                     final FastImageSource imageSource = FastImageViewConverter.getImageSource(activity, source);
                     final int index = i;
-                    Target target = Glide
+                    Target<Drawable> target = Glide
                             .with(activity.getApplicationContext())
                             .load(
                                     imageSource.isBase64Resource() ? imageSource.getSource() :
@@ -113,7 +115,11 @@ class FastImageViewModule extends ReactContextBaseJavaModule implements Lifecycl
                                     results[index] = false;
                                     mTargetSet.remove(target);
                                     if (loadedCount[0] == sources.size()) {
-                                        promise.resolve(results);
+                                        WritableArray array = new WritableNativeArray();
+                                        for (boolean b : results) {
+                                            array.pushBoolean(b);
+                                        }
+                                        promise.resolve(array);
                                     }
                                     return false;
                                 }
@@ -124,7 +130,11 @@ class FastImageViewModule extends ReactContextBaseJavaModule implements Lifecycl
                                     results[index] = true;
                                     mTargetSet.remove(target);
                                     if (loadedCount[0] == sources.size()) {
-                                        promise.resolve(results);
+                                        WritableArray array = new WritableNativeArray();
+                                        for (boolean b : results) {
+                                            array.pushBoolean(b);
+                                        }
+                                        promise.resolve(array);
                                     }
                                     return false;
                                 }
